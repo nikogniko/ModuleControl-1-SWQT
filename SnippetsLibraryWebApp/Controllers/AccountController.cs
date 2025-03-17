@@ -12,6 +12,7 @@ namespace SnippetsLibraryWebApp.Controllers
     public class AccountController : Controller
     {
         private readonly UserRepository _userRepository;
+        private const string CookieAuthScheme = "CookieAuth"; // Визначаємо константу для схеми автентифікації
 
         public AccountController(UserRepository userRepository)
         {
@@ -53,14 +54,14 @@ namespace SnippetsLibraryWebApp.Controllers
                         new Claim(ClaimTypes.Name, model.username)
                     };
 
-                    var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthScheme);
 
                     var authProperties = new AuthenticationProperties
                     {
                         // Налаштування автентифікації, якщо потрібно
                     };
 
-                    await HttpContext.SignInAsync("CookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
+                    await HttpContext.SignInAsync(CookieAuthScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
                     return Json(new { success = true, message = "User registered successfully", userId = userId.Value });
                 }
@@ -110,7 +111,7 @@ namespace SnippetsLibraryWebApp.Controllers
                         new Claim(ClaimTypes.Email, user.Email)
                     };
 
-                    var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthScheme);
 
                     var authProperties = new AuthenticationProperties
                     {
@@ -118,7 +119,7 @@ namespace SnippetsLibraryWebApp.Controllers
                         IsPersistent = model.RememberMe
                     };
 
-                    await HttpContext.SignInAsync("CookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
+                    await HttpContext.SignInAsync(CookieAuthScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
                     if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                     {
@@ -149,7 +150,7 @@ namespace SnippetsLibraryWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync("CookieAuth");
+            await HttpContext.SignOutAsync(CookieAuthScheme);
             return RedirectToAction("AllSnippets", "Snippets");
         }
     }
