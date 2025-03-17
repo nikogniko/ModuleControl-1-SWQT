@@ -150,7 +150,6 @@ a {
 }
 
 .modal-title {
-    /*    text-align: center;*/
     color: var(--dark-accent-color);
     margin-bottom: 10px;
     font-size: 26px;
@@ -419,9 +418,6 @@ body .container {
     width: 100%;
     padding: 10px;
     cursor: pointer;
-    /*border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;*/
 }
 
 /* Стилі для перемикачів статусу */
@@ -681,7 +677,6 @@ input[type="radio"]:checked + .toggle-label {
 
 .snippet-description {
     margin-top: 12px;
-    /*  position: relative;*/
     display: flex;
     gap: 10px;
 }
@@ -902,7 +897,6 @@ input[type="radio"]:checked + .toggle-label {
 
     .filter-button::before {
         content: "\1F52E"; /* Символ Unicode для піктограми (лупа) - 1F50D */
-        /*        margin-right: 8px;*/
     }
 
     .filter-button:hover {
