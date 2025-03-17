@@ -117,11 +117,13 @@
 ### Завдання 2: Модель якості
 
 [Тут](https://sonarcloud.io/project/overview?id=nikogniko_ModuleControl-1-SWQT) будуть звіти SonarQube, що є результатами виконання аналізу, вбудованого в CI/CD:
+![image](https://github.com/user-attachments/assets/480f4350-b702-48c2-8d0e-15b24b72c3a4)
 
 Ось загальні результати початкового аналізу:
+![image](https://github.com/user-attachments/assets/586ba419-2104-48bb-878d-74b0cabd4ae5)
 
 А ось результат аналізу коду у VisualStudio через Code Metrics:
-
+![image](https://github.com/user-attachments/assets/b04e6101-fd6f-4e18-b710-b4cb0e62d7e9)
 
 Нижче наведено детальний аналіз результатів вимірювання кодової бази проєкту **SnippetsLibraryWebApp (Debug)** за різними метриками:
 ##### 1. **Maintainability Index (Індекс підтримуваності)**
