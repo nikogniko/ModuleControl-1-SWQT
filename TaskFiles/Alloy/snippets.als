@@ -1,58 +1,95 @@
-// Сигнатури
+module SnippetsLibrary
 
-sig User {
-  snippets: set Snippet
-}
+// 1. Сигнатури (класи)
 
-sig Title{}
-sig Code{}
-enum Status { Draft, Published, Archived }
-
-sig Category {
-  name: one String,
-  snippets: set Snippet
-}
-
+// --- Snippet ---
 sig Snippet {
-  title: one Title,
-  code: one Code,
-  owner: one User,
-  categories: set Category,
-  likes: set User,
-  status: one Status
+  ID:          one Int,
+  Title:       one Int, // Заміна String на Int
+  Description: one Int, // Заміна String на Int 
+  Code:        one Int, // Заміна String на Int
+  _status:     one Int, // Заміна String на Int
+  Status:      one Int, // Заміна String на Int
+  SavesCount:  one Int,
+
+  CreatedAt:   one Int,
+  UpdatedAt:   one Int,
+
+  author:      one User,
+  language:    one ProgrammingLanguage,
+  tags:        set Tag,
+  categories:  set Category
 }
 
-// Факти (обмеження)
-// Кожен сніпет має належати своєму власнику 
-//(тобто, сніпет входить до множини snippets свого власника).
-fact SnippetOwnership {
-  all s: Snippet | s in s.owner.snippets
+// --- User ---
+sig User {
+  Id:           one Int,
+  Username:     one Int,  // Заміна String на Int
+  Email:        one Int,  // Заміна String на Int
+  PasswordHash: one Int,  // Заміна String на Int
+
+  snippets:     set Snippet
 }
 
-// 3. Унікальність назв сніпетів для кожного користувача.
-fact SnippetUniquePerUser {
-  all u: User, s1, s2: u.snippets | s1 != s2 implies s1.title != s2.title
+// --- ProgrammingLanguage ---
+sig ProgrammingLanguage {
+  ID:   one Int,
+  Name: one Int, // Заміна String на Int
 }
 
-// 4. Кожен сніпет має належати хоча б одній категорії.
-fact SnippetCategory {
-  all s: Snippet | some s.categories
+// --- Tag ---
+sig Tag {
+  ID:   one Int,
+  Name: one Int, // Заміна String на Int
+
+  snippets: set Snippet
 }
 
-// Обмеження на довжину коду сніпета (не більше 1000 символів).
-//    Зауваження: у Alloy стандартно не реалізовано функцію вимірювання довжини рядка,
-//    тому цей факт служить демонстраційним (якщо розглядати code як множину символів).
-fact CodeLengthConstraint {
-  all s: Snippet | #(s.code) <= 1000
+// --- Category ---
+sig Category {
+  ID:   one Int,
+  Name: one Int, // Заміна String на Int
+
+  snippets: set Snippet
 }
 
-// Перевірки (асерти)
+// 2. Факти (обмеження)
 
-// Перевірка, що кожен сніпет належить хоча б одній категорії.
-assert SnippetCategoryAssert {
-  all s: Snippet | some s.categories
+// 2.1 Унікальність ID у кожному типі
+fact uniqueIDs {
+  all disj s1, s2: Snippet | s1.ID = s2.ID implies s1 = s2
+  all disj u1, u2: User | u1.Id = u2.Id implies u1 = u2
+  all disj pl1, pl2: ProgrammingLanguage | pl1.ID = pl2.ID implies pl1 = pl2
+  all disj t1, t2: Tag | t1.ID = t2.ID implies t1 = t2
+  all disj c1, c2: Category | c1.ID = c2.ID implies c1 = c2
 }
-check SnippetCategoryAssert for 5
 
-// Генерація прикладів інстансів моделі.
-run {} for 5 but 6 Int
+// 2.2 Узгодження зв’язку Snippet <-> User
+fact userSnippetConsistency {
+  all s: Snippet | s in s.author.snippets
+}
+
+// 2.3 Узгодження зв’язку Snippet <-> ProgrammingLanguage
+fact languageSnippetConsistency {
+  all s: Snippet | s in s.language.snippets
+}
+
+// 2.4 Узгодження зв’язку Snippet <-> Tag
+fact snippetTagConsistency {
+  all s: Snippet, t: Tag |
+    (t in s.tags) iff (s in t.snippets)
+}
+
+// 2.5 Узгодження зв’язку Snippet <-> Category
+fact snippetCategoryConsistency {
+  all s: Snippet, c: Category |
+    (c in s.categories) iff (s in c.snippets)
+}
+
+// 2.6 Код та назва сніпету не можуть бути пустими
+fact snippetNonEmptyFields {
+  all s: Snippet | s.Title != none and s.Code != none
+}
+
+// 3. Генерація прикладів інстансів моделі
+run {} for 5 but 8 Int
