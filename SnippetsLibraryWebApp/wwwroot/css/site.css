@@ -10,6 +10,8 @@
 
 html {
     font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -20,11 +22,6 @@ html {
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-    position: relative;
-    min-height: 100%;
 }
 
 body {
@@ -431,11 +428,6 @@ body .container {
         display: none;
     }
 
-.status-toggle-group {
-    display: flex;
-    gap: 10px;
-}
-
     .status-toggle-group .toggle-label {
         display: inline-block;
         padding: 5px 15px;
@@ -477,11 +469,6 @@ input[type="radio"]:checked + .toggle-label {
     width: auto;
     height: stretch;
     min-height: 580px;
-}
-
-.code-editor-container {
-    height: 600px;
-    min-height: 600px;
 }
 
 /* Стилі для категорій */
@@ -581,6 +568,8 @@ input[type="radio"]:checked + .toggle-label {
 
 /* Стилі для блоку коду */
 .code-editor-container {
+    height: 600px;
+    min-height: 600px;
     background-color: #2d2d2d;
     color: #f8f8f2;
     padding: 10px;
@@ -743,11 +732,6 @@ input[type="radio"]:checked + .toggle-label {
 .snippet-categories .badge {
     font-size: 0.8rem;
     padding: 0.3em 0.6em;
-}
-
-.snippet-tag, .snippet-category {
-    margin-right: 5px;
-    margin-bottom: 5px;
 }
 
 /* Стилізація кнопки збереження сніпета */
