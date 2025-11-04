@@ -157,6 +157,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css">
 <!-- Ініціалізація CodeMirror -->
 <script>
+    // Словник для мапінгу мов
+    const languageMap = {
+        "C#": "csharp",
+        "C++": "cpp",
+        "F#": "fsharp",
+        "VB.NET": "vbnet",
+        "PL/SQL": "plsql",
+        "Objective-C": "objectivec",
+        "T-SQL": "tsql",
+        "Visual Basic": "vbnet",
+        "Shell script": "shell"
+    };
+
     document.addEventListener("DOMContentLoaded", function () {
         var codeTextarea = document.getElementById("ViewCode");
         var language = "@((await _programmingLanguageRepository.GetLanguageByIdAsync(Model.ProgrammingLanguageID)).Name)";
@@ -203,15 +216,7 @@
             yaml: "yaml",
         };
 
-        language = language == "C#" ? "csharp" :
-            language == "C++" ? "cpp" :
-                language == "F#" ? "fsharp" :
-                    language == "VB.NET" ? "vbnet" :
-                        language == "PL/SQL" ? "plsql" :
-                            language == "Objective-C" ? "objectivec" :
-                                language == "T-SQL" ? "tsql" :
-                                    language == "Visual Basic" ? "vbnet" :
-                                        language == "Shell script" ? "shell" : language
+        language = languageMap[language] || language;
 
         var mode = modeMap[language.toString().toLowerCase()] || "plaintext"
 

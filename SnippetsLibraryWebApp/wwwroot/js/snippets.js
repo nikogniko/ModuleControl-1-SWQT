@@ -319,7 +319,7 @@
             return;
         }
 
-        var extra = $(this).find('.snippet-extra');
+        let extra = $(this).find('.snippet-extra');
         extra.slideToggle(300);
     });
 
@@ -327,8 +327,8 @@
         e.preventDefault();
         e.stopPropagation();
 
-        var snippetCard = $(this).closest('.snippet-card');
-        var snippetId = snippetCard.closest('[data-id]').data('id');
+        const snippetCard = $(this).closest('.snippet-card');
+        const snippetId = snippetCard.closest('[data-id]').data('id');
         // Перенаправлення на сторінку деталей сніпета
         window.open('/Snippets/Details/' + snippetId, '_blank');
     });

@@ -10,8 +10,8 @@ $(document).ready(function () {
 
     // Function to toggle password visibility
     $('.toggle-login-password').on('click', function () {
-        var loginInput = $('#loginPassword');
-        var type = loginInput.attr('type') === 'password' ? 'text' : 'password';
+        const loginInput = $('#loginPassword');
+        const type = loginInput.attr('type') === 'password' ? 'text' : 'password';
         loginInput.attr('type', type);
         $(this).text(type === 'password' ? 'Show' : 'Hide');
     });
@@ -19,8 +19,8 @@ $(document).ready(function () {
     // Function to handle login form submission
     $('#loginForm').on('submit', function (e) {
         e.preventDefault();
-        var email = $('#loginEmail').val();
-        var password = $('#loginPassword').val();
+        const email = $('#loginEmail').val();
+        const password = $('#loginPassword').val();
 
         // Basic validation
         if (!email || !password) {
@@ -29,7 +29,7 @@ $(document).ready(function () {
         }
 
         // Get the anti-forgery token
-        var token = $('input[name="__RequestVerificationToken"]').val();
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
         $.ajax({
             type: 'POST',

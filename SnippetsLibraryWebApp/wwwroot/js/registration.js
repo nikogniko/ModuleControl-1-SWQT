@@ -9,8 +9,8 @@ $(document).ready(function () {
 
     // Function to toggle password visibility
     $('.toggle-register-password').on('click', function () {
-        var passwordInput = $('#registerPassword');
-        var type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+        const passwordInput = $('#registerPassword');
+        const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
         passwordInput.attr('type', type);
         $(this).text(type === 'password' ? 'Show' : 'Hide');
     });
@@ -18,9 +18,9 @@ $(document).ready(function () {
     // Function to handle registration form submission
     $('#registerForm').on('submit', function (e) {
         e.preventDefault();
-        var username = $('#registerUsername').val();
-        var email = $('#registerEmail').val();
-        var password = $('#registerPassword').val();
+        const username = $('#registerUsername').val();
+        const email = $('#registerEmail').val();
+        const password = $('#registerPassword').val();
 
         // Basic validation
         if (!username || !email || !password) {
@@ -39,7 +39,7 @@ $(document).ready(function () {
         }
 
         // Отримати Anti-Forgery Token
-        var token = $('input[name="__RequestVerificationToken"]').val();
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
         $.ajax({
             type: 'POST',
