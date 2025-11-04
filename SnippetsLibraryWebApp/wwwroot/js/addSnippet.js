@@ -1,9 +1,22 @@
 ﻿// wwwroot/js/addSnippet.js
 
+// Словник для мапінгу мов
+const languageMap = {
+    "C#": "csharp",
+    "C++": "cpp",
+    "F#": "fsharp",
+    "VB.NET": "vbnet",
+    "PL/SQL": "plsql",
+    "Objective-C": "objectivec",
+    "T-SQL": "tsql",
+    "Visual Basic": "vbnet",
+    "Shell script": "shell"
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     const maxCategories = 3;
     const maxTags = 6; // Встановіть ліміт для тегів за потребою або видаліть, якщо без ліміту
-    var language = languageName || "plaintext"
+    let language = languageName || "plaintext"
 
     const languageModes = {
         bash: "shell",
@@ -47,21 +60,13 @@ document.addEventListener('DOMContentLoaded', function () {
         yaml: "yaml",
     };
 
-    language = language == "C#" ? "csharp" :
-        language == "C++" ? "cpp" :
-            language == "F#" ? "fsharp" :
-                language == "VB.NET" ? "vbnet" :
-                    language == "PL/SQL" ? "plsql" :
-                        language == "Objective-C" ? "objectivec" :
-                            language == "T-SQL" ? "tsql" :
-                                language == "Visual Basic" ? "vbnet" :
-                                    language == "Shell script" ? "shell" : language
+    language = languageMap[language] || language;
 
-    var mode = languageModes[language.toString().toLowerCase()] || "plaintext"
+    const mode = languageModes[language.toString().toLowerCase()] || "plaintext"
 
     // Перевірте, чи присутній будь-який з форм
-    var isAddForm = $('#addSnippetForm').length > 0;
-    var isEditForm = $('#editSnippetForm').length > 0;
+    const isAddForm = $('#addSnippetForm').length > 0;
+    const isEditForm = $('#editSnippetForm').length > 0;
 
     if (isAddForm) {
         initializeForm('#addSnippetForm', '/Snippets/CreateSnippetAsync', 'add');
@@ -79,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
         initializeDropdown(form.find('.tag-select-container #tagDropdown'), '.tag-checkbox', form.find('#selectedTags'), maxTags, 'tag', true);
 
         // Ініціалізація CodeMirror
-        var editor = CodeMirror.fromTextArea(document.getElementById('Code'), {
+        const editor = CodeMirror.fromTextArea(document.getElementById('Code'), {
             mode: mode,
             theme: "monokai",
             lineNumbers: true,
@@ -92,17 +97,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Обробка зміни мови програмування
         form.find('#ProgrammingLanguageID').on('change', function (e) {
             language = form.find('#ProgrammingLanguageID option:selected').text();
-            language = language == "C#" ? "csharp" :
-                language == "C++" ? "cpp" :
-                    language == "F#" ? "fsharp" :
-                        language == "VB.NET" ? "vbnet" :
-                            language == "PL/SQL" ? "plsql" :
-                                language == "Objective-C" ? "objectivec" :
-                                    language == "T-SQL" ? "tsql" :
-                                        language == "Visual Basic" ? "vbnet" :
-                                            language == "Shell script" ? "shell" : language
+            language = languageMap[language] || language;
 
-            var mode = languageModes[language.toString().toLowerCase()] || "plaintext"
+            const mode = languageModes[language.toString().toLowerCase()] || "plaintext"
             editor.setOption("mode", mode);
         });
 
@@ -111,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
 
             // Валідація вибору категорій і тегів
-            var selectedCategories = form.find('.category-checkbox:checked').length;
-            var selectedTags = form.find('.tag-checkbox:checked').length;
+            const selectedCategories = form.find('.category-checkbox:checked').length;
+            const selectedTags = form.find('.tag-checkbox:checked').length;
 
             if (selectedCategories > maxCategories) {
                 alert("Ви можете обрати максимум 3 категорії.");
@@ -128,8 +125,8 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#Code').val(editor.getValue());
 
             // Збирання даних форми
-            var formData = form.serializeArray();
-            var data = {};
+            const formData = form.serializeArray();
+            const data = {};
             formData.forEach(function (item) {
                 if (data[item.name]) {
                     if (Array.isArray(data[item.name])) {
@@ -198,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Обробка додавання нових тегів (за потреби)
         form.find('#addTagBtn').on('click', function () {
-            var newTag = form.find('#addTag').val().trim();
+            const newTag = form.find('#addTag').val().trim();
             if (newTag) {
                 // Відправляємо POST-запит на сервер для додавання тега
                 $.ajax({
