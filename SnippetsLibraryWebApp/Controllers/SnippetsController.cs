@@ -22,6 +22,51 @@ namespace SnippetsLibraryWebApp.Controllers
         private readonly ProgrammingLanguageRepository _programmingLanguageRepository;
         private readonly UserRepository _userRepository;
 
+        /// <summary>
+        /// (МОДУЛЬ 1) Пере-заповнює модель категоріями та тегами.
+        /// Це виправляє помилку, оскільки ця логіка має виконуватися
+        /// ЗАВЖДИ, а не тільки коли модель невалідна.
+        /// </summary>
+        private async Task PopulateModelCollections(EditSnippetViewModel model, int[] selectedCategories, int[] selectedTags)
+        {
+            model.Categories = new List<CategoryModel>();
+            foreach (var categoryId in selectedCategories)
+            {
+                model.Categories.Add(await _categoryRepository.GetCategoryByIdAsync(categoryId));
+            }
+
+            model.Tags = new List<TagModel>();
+            foreach (var tagId in selectedTags)
+            {
+                model.Tags.Add(await _tagRepository.GetTagsByIdAsync(tagId));
+            }
+        }
+
+        /// <summary>
+        /// (МОДУЛЬ 2) Ефективно перевіряє, чи змінився набір категорій.
+        /// Замінює складний цикл 'for'.
+        /// </summary>
+        private bool CheckCategoriesChanged(ICollection<CategoryModel> existingCategories, int[] newCategoryIds)
+        {
+            // Створюємо HashSet ID зі старої колекції
+            var oldIds = existingCategories.Select(c => c.ID).ToHashSet();
+
+            // Створюємо HashSet ID з нового масиву
+            var newIds = new HashSet<int>(newCategoryIds);
+
+            // Порівнюємо два набори. Це набагато швидше і чистіше.
+            return !oldIds.SetEquals(newIds);
+        }
+
+        /// <summary>
+        /// (МОДУЛЬ 3) Ефективно перевіряє, чи змінився набір тегів.
+        /// </summary>
+        private bool CheckTagsChanged(ICollection<TagModel> existingTags, int[] newTagIds)
+        {
+            var oldIds = existingTags.Select(t => t.ID).ToHashSet();
+            var newIds = new HashSet<int>(newTagIds);
+            return !oldIds.SetEquals(newIds);
+        }
 
         public SnippetsController(
             SnippetRepository snippetRepository, 
@@ -185,74 +230,42 @@ namespace SnippetsLibraryWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditSnippet(EditSnippetViewModel model, int[] selectedCategories, int[] selectedTags)
         {
+            // 1. Спочатку заповнюємо модель новими даними
+            // (Цей блок винесено з 'if' і виправлено, та виділено в окремий метод)
+            await PopulateModelCollections(model, selectedCategories, selectedTags);
+
+            // 2. Перевіряємо валідність
             if (!ModelState.IsValid)
             {
-                if (model.Categories == null || model.Categories.Count() == 0)
-                {
-                    model.Categories = new List<CategoryModel>();
-
-                    if(selectedCategories.Length > 0)
-                    {
-                        foreach(var categoryId in selectedCategories)
-                        {
-                            model.Categories.Add(await _categoryRepository.GetCategoryByIdAsync(categoryId));
-                        }
-                    }
-                }
-
-                if (model.Tags == null || model.Tags.Count() == 0)
-                {
-                    model.Tags = new List<TagModel>();
-
-                    if (selectedTags.Length > 0)
-                    {
-                        foreach (var tagId in selectedTags)
-                        {
-                            model.Tags.Add(await _tagRepository.GetTagsByIdAsync(tagId));
-                        }
-                    }
-                }
-                // Повторно завантажити категорії та теги, якщо модель не валідна
-                //model.Categories = (await _categoryRepository.GetCategoriesBySnippetIdAsync(model.ID)).ToList();
-                //model.Tags = (await _tagRepository.GetTagsBySnippetIdAsync(model.ID)).ToList();
+                // Якщо модель невалідна, ми не можемо продовжити.
+                // Оскільки цей метод повертає Json, ми повернемо помилку.
+                // (Твоя стара логіка тут була для повернення View, але метод повертає Json)
+                return Json(new { success = false, error = "Model state is invalid." });
             }
 
+            // 3. Отримуємо існуючий сніпет
             var existingSnippet = await _snippetsRepository.GetSnippetByIdAsync(model.ID);
             if (existingSnippet == null)
             {
                 return Forbid();
             }
 
-            var areCategoriesChanged = existingSnippet.Categories.Count() != model.Categories.Count();
-            var areTagsChanged = existingSnippet.Tags.Count() != model.Tags.Count();
+            // 4. Викликаємо чисті методи-модулі для перевірки змін
+            // (Замість складних і повільних циклів 'for')
+            var areCategoriesChanged = CheckCategoriesChanged(existingSnippet.Categories, selectedCategories);
+            var areTagsChanged = CheckTagsChanged(existingSnippet.Tags, selectedTags);
 
-            for(var i = 0; i < Math.Min(existingSnippet.Categories.Count(), model.Categories.Count()); i++)
-            {
-                if (existingSnippet.Categories.ElementAt(i).ID != model.Categories.ElementAt(i).ID)
-                {
-                    areCategoriesChanged = true;
-                }
-            }
-
-            for (var i = 0; i < Math.Min(existingSnippet.Tags.Count(), model.Tags.Count()); i++)
-            {
-                if (existingSnippet.Tags.ElementAt(i).ID != model.Tags.ElementAt(i).ID)
-                {
-                    areTagsChanged = true;
-                }
-            }
-
-            // Оновлення полів сніпета
+            // 5. Оновлення полів сніпета
             existingSnippet.Title = model.Title;
             existingSnippet.Description = model.Description;
             existingSnippet.ProgrammingLanguageID = model.ProgrammingLanguageID;
             existingSnippet.Status = model.Status;
             existingSnippet.Code = model.Code;
             existingSnippet.UpdatedAt = DateTime.UtcNow;
-            existingSnippet.Tags = model.Tags;
-            existingSnippet.Categories = model.Categories;
+            existingSnippet.Tags = model.Tags;           // Тепер містить оновлені дані
+            existingSnippet.Categories = model.Categories; // Тепер містить оновлені дані
 
-            // Збереження змін
+            // 6. Збереження змін
             var result = await _snippetsRepository.UpdateSnippetAsync(existingSnippet, int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value), areCategoriesChanged, areTagsChanged);
 
             if (result)
